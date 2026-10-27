@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Gemini AI Analysis</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    {% include 'navbar.html' %}
+
+    <div class="container">
+
+        <div class="header">
+
+            <h1>
+                Gemini AI Analysis
+            </h1>
+
+            <p>
+                AI-assisted analysis of the submitted news
+            </p>
+
+        </div>
+
+
+        <div class="result-card">
+
+
+            <!-- News Article -->
+
+            <div class="article">
+
+                <h3>
+                    News Article
+                </h3>
+
+                <p>
+                    {{ news_text }}
+                </p>
+
+            </div>
+
+
+            {% if analysis.success %}
+
+                <!-- Successful Gemini Analysis -->
+
+                <div class="gemini-analysis">
+
+                    <h3>
+                        AI Analysis
+                    </h3>
+
+                    <div class="analysis-content">
+
+                        {{ analysis.message
+                           | replace('\n', '<br>')
+                           | safe }}
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <!-- Gemini Error -->
+
+                <div class="gemini-error">
+
+                    <h3>
+                        Gemini AI Temporarily Unavailable
+                    </h3>
+
+                    <p>
+                        {{ analysis.message }}
+                    </p>
+
+                    <p>
+                        Your machine-learning prediction
+                        is still available and was not affected
+                        by this problem.
+                    </p>
+
+
+                    <form
+                        action="{{ url_for('gemini_analyze') }}"
+                        method="POST"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="news_text"
+                            value="{{ news_text }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="gemini-btn"
+                        >
+                            Try Again
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Back Button -->
+
+            <a
+                href="/"
+                class="back-button"
+            >
+                ← Analyze Another News Article
+            </a>
+
+        </div>
+
+
+        <!-- Warning -->
+
+        <div class="warning">
+
+            <strong>Important:</strong>
+
+            Gemini provides AI-generated analysis.
+
+            This analysis does not independently establish
+            that a news article is factually true or false.
+
+            Important claims should be verified using
+            reliable sources.
+
+        </div>
+
+
+        <div class="footer">
+
+            <p>
+                Fake News Detection using Machine Learning
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

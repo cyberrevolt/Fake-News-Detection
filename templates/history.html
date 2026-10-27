@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Prediction History - Fake News Detection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    {% include 'navbar.html' %}
+
+<div class="container">
+
+    <!-- =====================================
+         HEADER
+         ===================================== -->
+
+    <div class="header">
+
+        <h1>Prediction History</h1>
+
+        <p>
+            Previous Fake News Detection Predictions
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         NAVIGATION
+         ===================================== -->
+    <!--
+    <div class="dashboard-navigation">
+
+        <a href="/" class="nav-button">
+            Analyze News
+        </a>
+
+        <a href="/dashboard" class="nav-button">
+            Dashboard
+        </a>
+
+    </div>
+    -->
+
+    <div class="history-management">
+
+        <form
+            method="POST"
+            action="{{ url_for('clear_history') }}"
+            onsubmit="return confirmClearHistory();"
+        >
+
+            <button
+                type="submit"
+                class="clear-history-button"
+            >
+                Clear All History
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         SEARCH AND FILTER
+         ===================================== -->
+
+    <div class="history-filters">
+
+        <form method="GET" action="/history">
+
+            <!-- Search News -->
+
+            <div class="filter-group">
+
+                <label for="search">
+                    Search News
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    placeholder="Search article text..."
+                    value="{{ search }}"
+                >
+
+            </div>
+
+
+            <!-- Prediction Filter -->
+
+            <div class="filter-group">
+
+                <label for="prediction">
+                    Prediction
+                </label>
+
+                <select
+                    id="prediction"
+                    name="prediction"
+                >
+
+                    <option
+                        value="ALL"
+                        {% if prediction_filter == "ALL" %}
+                        selected
+                        {% endif %}
+                    >
+                        All Predictions
+                    </option>
+
+                    <option
+                        value="FAKE NEWS"
+                        {% if prediction_filter == "FAKE NEWS" %}
+                        selected
+                        {% endif %}
+                    >
+                        Fake News
+                    </option>
+
+                    <option
+                        value="REAL NEWS"
+                        {% if prediction_filter == "REAL NEWS" %}
+                        selected
+                        {% endif %}
+                    >
+                        Real News
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- From Date -->
+
+            <div class="filter-group">
+
+                <label for="date_from">
+                    From Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date_from"
+                    name="date_from"
+                    value="{{ date_from }}"
+                >
+
+            </div>
+
+
+            <!-- To Date -->
+
+            <div class="filter-group">
+
+                <label for="date_to">
+                    To Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date_to"
+                    name="date_to"
+                    value="{{ date_to }}"
+                >
+
+            </div>
+
+
+            <!-- Filter Buttons -->
+
+            <div class="filter-buttons">
+
+                <button
+                    type="submit"
+                    class="filter-button"
+                >
+                    Search
+                </button>
+
+                <a
+                    href="/history"
+                    class="clear-filter-button"
+                >
+                    Clear
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RESULTS INFORMATION
+         ===================================== -->
+
+    {% if pagination %}
+
+    <div class="history-result-info">
+
+        Showing
+        <strong>
+            {{ pagination.items|length }}
+        </strong>
+
+        of
+
+        <strong>
+            {{ pagination.total }}
+        </strong>
+
+        prediction(s)
+
+        {% if search %}
+            for
+            <strong>
+                "{{ search }}"
+            </strong>
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================
+         HISTORY TABLE
+         ===================================== -->
+
+    <div class="history-container">
+
+        {% if predictions %}
+
+        <div class="table-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            News Article
+                        </th>
+
+                        <th>
+                            Prediction
+                        </th>
+
+                        <th>
+                            Decision Score
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+                        
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for prediction in predictions %}
+
+                    <tr>
+
+                        <!-- ID -->
+
+                        <td>
+                            {{ prediction.id }}
+                        </td>
+
+
+                        <!-- NEWS ARTICLE -->
+
+                        <td class="news-text">
+
+                            {{ prediction.news_text }}
+
+                        </td>
+
+
+                        <!-- PREDICTION -->
+
+                        <td>
+
+                            {% if prediction.prediction == "FAKE NEWS" %}
+
+                                <span class="fake-badge">
+                                    FAKE NEWS
+                                </span>
+
+                            {% else %}
+
+                                <span class="real-badge">
+                                    REAL NEWS
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- DECISION SCORE -->
+
+                        <td>
+
+                            {{ "%.4f"|format(
+                                prediction.decision_score
+                            ) }}
+
+                        </td>
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            {{ prediction.created_at }}
+
+                        </td>
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'delete_prediction',
+                                    prediction_id=prediction.id
+                                ) }}"
+                                onsubmit="return confirmDelete();"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="delete-button"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================
+             PAGINATION
+             ===================================== -->
+
+        {% if pagination.pages > 1 %}
+
+        <div class="pagination">
+
+            <!-- PREVIOUS -->
+
+            {% if pagination.has_prev %}
+
+                <a
+                    href="{{ url_for(
+                        'history',
+                        page=pagination.prev_num,
+                        search=search,
+                        prediction=prediction_filter,
+                        date_from=date_from,
+                        date_to=date_to
+                    ) }}"
+                    class="page-button"
+                >
+                    ← Previous
+                </a>
+
+            {% endif %}
+
+
+            <!-- PAGE NUMBERS -->
+
+            {% for page_num in pagination.iter_pages(
+                left_edge=1,
+                left_current=1,
+                right_current=1,
+                right_edge=1
+            ) %}
+
+                {% if page_num %}
+
+                    {% if page_num == pagination.page %}
+
+                        <span class="page-button active-page">
+                            {{ page_num }}
+                        </span>
+
+                    {% else %}
+
+                        <a
+                            href="{{ url_for(
+                                'history',
+                                page=page_num,
+                                search=search,
+                                prediction=prediction_filter,
+                                date_from=date_from,
+                                date_to=date_to
+                            ) }}"
+                            class="page-button"
+                        >
+                            {{ page_num }}
+                        </a>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <span class="page-dots">
+                        ...
+                    </span>
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            <!-- NEXT -->
+
+            {% if pagination.has_next %}
+
+                <a
+                    href="{{ url_for(
+                        'history',
+                        page=pagination.next_num,
+                        search=search,
+                        prediction=prediction_filter,
+                        date_from=date_from,
+                        date_to=date_to
+                    ) }}"
+                    class="page-button"
+                >
+                    Next →
+                </a>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <!-- =====================================
+             NO RESULTS
+             ===================================== -->
+
+        <div class="no-history">
+
+            <h2>
+                No Prediction History Found
+            </h2>
+
+            {% if search or prediction_filter != "ALL" or date_from or date_to %}
+
+                <p>
+                    No predictions match your selected filters.
+                </p>
+
+                <a
+                    href="/history"
+                    class="nav-button"
+                >
+                    Clear Filters
+                </a>
+
+            {% else %}
+
+                <p>
+                    No news articles have been analyzed yet.
+                </p>
+
+                <a
+                    href="/"
+                    class="nav-button"
+                >
+                    Analyze Your First Article
+                </a>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+<script>
+
+function confirmDelete() {
+
+    return confirm(
+        "Are you sure you want to delete this prediction?"
+    );
+
+}
+
+
+function confirmClearHistory() {
+
+    return confirm(
+        "WARNING!\n\n" +
+        "This will permanently delete ALL prediction history.\n\n" +
+        "Are you sure you want to continue?"
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

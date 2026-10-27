@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Fake News Detection</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    {% include 'navbar.html' %}
+
+    <div class="container">
+
+        <section class="hero-shell">
+            <div class="hero-copy">
+                <div class="hero-kicker"><span class="status-dot"></span> MACHINE-LEARNING NEWS ANALYSIS</div>
+                <h1>A clearer signal<br><span>in every story.</span></h1>
+                <p>Analyze article text with a trained model and review its classification and decision score.</p>
+                <div class="hero-tags" aria-label="Model details">
+                    <span>TF-IDF features</span>
+                    <span>Linear SVM model</span>
+                </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="network-glow"></div>
+                <svg class="neural-graphic" viewBox="0 0 480 360" fill="none">
+                    <defs>
+                        <linearGradient id="network-line" x1="90" y1="65" x2="385" y2="305" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#BDA9F2" stop-opacity=".18"/>
+                            <stop offset=".52" stop-color="#A98BF0" stop-opacity=".78"/>
+                            <stop offset="1" stop-color="#8FC4D0" stop-opacity=".24"/>
+                        </linearGradient>
+                        <radialGradient id="network-core" cx="0" cy="0" r="1" gradientTransform="translate(240 180) rotate(90) scale(126)" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#A78BFA" stop-opacity=".22"/>
+                            <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="240" cy="180" r="126" fill="url(#network-core)"/>
+                    <circle class="network-orbit orbit-one" cx="240" cy="180" r="110" stroke="#BDA9F2" stroke-opacity=".32" stroke-dasharray="2 10"/>
+                    <circle class="network-orbit orbit-two" cx="240" cy="180" r="145" stroke="#8FC4D0" stroke-opacity=".2" stroke-dasharray="1 13"/>
+                    <g class="network-links" stroke="url(#network-line)" stroke-width="1.5">
+                        <path d="m92 111 86 37 65-67 61 57 79-25M92 111l40 117 46-80 61 88 65-98 72 95 67-120M132 228l75 48 32-40 66 52 59-55M178 148l29 128m36-195 4 155m61-98-3 150m64-175-23 146"/>
+                        <path d="m92 111 149 65 142-63M132 228l111-52 97 60" stroke-opacity=".5"/>
+                    </g>
+                    <g class="network-nodes">
+                        <circle class="network-node node-a" cx="92" cy="111" r="5"/><circle class="network-node node-b" cx="132" cy="228" r="4"/>
+                        <circle class="network-node node-c" cx="178" cy="148" r="6"/><circle class="network-node node-d" cx="207" cy="276" r="4"/>
+                        <circle class="network-node node-e" cx="243" cy="81" r="5"/><circle class="network-node node-f" cx="243" cy="176" r="8"/>
+                        <circle class="network-node node-g" cx="275" cy="236" r="5"/><circle class="network-node node-h" cx="304" cy="138" r="6"/>
+                        <circle class="network-node node-i" cx="326" cy="288" r="4"/><circle class="network-node node-j" cx="383" cy="113" r="5"/>
+                        <circle class="network-node node-k" cx="397" cy="233" r="4"/><circle class="network-node node-l" cx="208" cy="216" r="4"/>
+                    </g>
+                    <g class="network-center">
+                        <circle cx="243" cy="176" r="25" fill="#211B2D" stroke="#C8B7F2" stroke-opacity=".72"/>
+                        <path d="M243 160v32m-13-16h26m-22-11 18 22m0-22-18 22" stroke="#D9D0F1" stroke-width="1.4" stroke-linecap="round"/>
+                        <circle cx="243" cy="176" r="3" fill="#9CC9D0"/>
+                    </g>
+                </svg>
+                <div class="visual-caption"><span>MODEL PIPELINE</span><span>FEATURES <i></i> CLASSIFICATION</span></div>
+            </div>
+        </section>
+
+
+        <section class="card analysis-card">
+
+            <div class="section-heading">
+                <div>
+                    <span class="section-eyebrow">START AN ANALYSIS</span>
+                    <h2>Analyze an article</h2>
+                </div>
+                <span class="analysis-status"><span class="status-dot"></span> Model ready</span>
+            </div>
+
+            <form
+                action="/predict"
+                method="POST"
+            >
+
+                <label for="news_text">
+                    Enter News Article
+                </label>
+
+                <textarea
+                    id="news_text"
+                    name="news_text"
+                    placeholder="Paste or type the article you want to analyze..."
+                    required
+                ></textarea>
+
+                {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+                {% endif %}
+
+
+                <button type="submit" class="analyze-button">
+                    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2.8 11.8 8l5.2 2-5.2 1.8-1.8 5.4-1.8-5.4L3 10l5.2-2L10 2.8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                    Analyze News
+                    <span class="button-arrow" aria-hidden="true">→</span>
+                </button>
+
+            </form>
+
+        </section>
+
+        <section class="workflow-panel">
+            <div class="workflow-heading">
+                <span class="section-eyebrow">BEHIND THE RESULT</span>
+                <h2>How analysis works</h2>
+            </div>
+            <div class="workflow-steps">
+                <article class="workflow-step">
+                    <span class="step-index">01</span>
+                    <div><h3>Prepare text</h3><p>Article text is cleaned and normalized.</p></div>
+                </article>
+                <article class="workflow-step">
+                    <span class="step-index">02</span>
+                    <div><h3>Extract features</h3><p>TF-IDF converts words into model features.</p></div>
+                </article>
+                <article class="workflow-step">
+                    <span class="step-index">03</span>
+                    <div><h3>Classify</h3><p>A trained Linear SVM returns a label and score.</p></div>
+                </article>
+            </div>
+        </section>
+
+
+        <div class="footer">
+
+            <p>
+                Fake News Detection using Machine Learning
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

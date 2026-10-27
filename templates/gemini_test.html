@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d0b12">
+    <title>Gemini Connection Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <main class="container gemini-test-page">
+        <header class="gemini-test-heading">
+            <span class="gemini-test-eyebrow">AI SERVICE CHECK</span>
+            <h1>Gemini connection test</h1>
+            <p>Check that the Gemini service is configured and responding for your AI-assisted article analysis.</p>
+        </header>
+
+        <section class="gemini-test-card {% if analysis.success %}is-success{% else %}is-error{% endif %}"
+                 aria-labelledby="gemini-test-status" aria-live="polite">
+            <div class="gemini-test-orb" aria-hidden="true"><span>{% if analysis.success %}✓{% else %}!{% endif %}</span></div>
+            <div class="gemini-test-copy">
+                <span class="gemini-test-status-label">{% if analysis.success %}Connection successful{% else %}Connection needs attention{% endif %}</span>
+                <h2 id="gemini-test-status">{% if analysis.success %}Gemini is responding{% else %}Gemini could not complete the test{% endif %}</h2>
+                {% if analysis.success %}
+                    <p>A response was received from the model. The Gemini connection is ready to analyze submitted articles.</p>
+                {% else %}
+                    <p class="gemini-test-error" role="alert">{{ analysis.message }}</p>
+                    <p>Review the API key, selected model, network connection, and Gemini API quota, then run the test again.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="gemini-test-details" aria-label="Connection details">
+            <div class="gemini-detail-item">
+                <span class="gemini-detail-icon" aria-hidden="true">⌘</span>
+                <div><span class="gemini-detail-label">API key</span><strong>{% if key_configured %}Configured{% else %}Missing{% endif %}</strong></div>
+                <span class="gemini-detail-state {% if key_configured %}state-good{% else %}state-bad{% endif %}" aria-hidden="true">●</span>
+            </div>
+            <div class="gemini-detail-item">
+                <span class="gemini-detail-icon" aria-hidden="true">✳</span>
+                <div><span class="gemini-detail-label">Selected model</span><strong class="gemini-model-name">{{ model_name }}</strong></div>
+            </div>
+            <div class="gemini-detail-item">
+                <span class="gemini-detail-icon" aria-hidden="true">↗</span>
+                <div><span class="gemini-detail-label">API response</span><strong>{% if analysis.success %}Received{% else %}Not received{% endif %}</strong></div>
+                <span class="gemini-detail-state {% if analysis.success %}state-good{% else %}state-bad{% endif %}" aria-hidden="true">●</span>
+            </div>
+        </section>
+
+        <section class="gemini-test-sample">
+            <div>
+                <span class="gemini-detail-label">TEST INPUT</span>
+                <h3>Sample article sent to Gemini</h3>
+            </div>
+            <p>{{ sample_news }}</p>
+        </section>
+
+        <div class="gemini-test-actions">
+            <a class="gemini-btn" href="{{ url_for('gemini_test') }}">Run test again <span aria-hidden="true">↻</span></a>
+            <a class="gemini-test-dashboard-link" href="{{ url_for('dashboard') }}">Back to admin dashboard <span aria-hidden="true">→</span></a>
+        </div>
+
+        <p class="gemini-test-note">This check confirms that Gemini can return a response. AI-generated analysis does not independently establish whether an article is true or false.</p>
+    </main>
+</body>
+</html>

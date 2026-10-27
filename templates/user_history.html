@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Prediction History | Fake News Detection</title>
+
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    {% include 'navbar.html' %}
+    <div class="container">
+
+        <div class="header user-history-header">
+            <div>
+                <h1>My Prediction History</h1>
+                <p class="subtitle">
+                    Welcome, {{ username }}. View your previous predictions here.
+                </p>
+            </div>
+
+            <div>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('home') }}" class="btn">
+                    Detect News
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Predictions</h2>
+
+            {% if predictions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>News Text</th>
+                            <th>Prediction</th>
+                            <th>Decision Score</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in predictions %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+
+                                <td class="news-text">
+                                    {{ item.news_text[:250] }}
+                                    {% if item.news_text|length > 250 %}...{% endif %}
+                                </td>
+
+                                <td>
+                                    {% if item.prediction == "FAKE NEWS" %}
+                                        <span class="badge fake">FAKE NEWS</span>
+                                    {% else %}
+                                        <span class="badge real">REAL NEWS</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ "%.4f"|format(item.decision_score) }}
+                                </td>
+
+                                <td>
+                                    {% if item.created_at %}
+                                        {{ item.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <div class="empty">
+                    <h3>No predictions yet</h3>
+                    <p>Your prediction history will appear here after you analyze news.</p>
+
+                    <a href="{{ url_for('home') }}" class="btn">
+                        Analyze News
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

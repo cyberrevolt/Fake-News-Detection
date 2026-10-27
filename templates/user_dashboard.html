@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Dashboard | Fake News Detection</title>
+
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    {% include 'navbar.html' %}
+
+    <!--
+    <nav class="navbar">
+
+        <h2>Fake News Detection</h2>
+
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">
+                Analyze News
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+        </div>
+
+    </nav>
+    -->
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>
+                Welcome, {{ username }}!
+            </h1>
+
+            <p>
+                This is your personal dashboard.
+                Your statistics and predictions are private
+                to your account.
+            </p>
+
+            <a class="action-btn"
+               href="{{ url_for('home') }}">
+                + Analyze News
+            </a>
+
+        </section>
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <h3>Total Predictions</h3>
+
+                <p class="number">
+                    {{ total_predictions }}
+                </p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Fake News Predictions</h3>
+
+                <p class="number fake-number">
+                    {{ fake_count }}
+                </p>
+
+                <small>
+                    {{ fake_percentage }}% of your predictions
+                </small>
+            </div>
+
+            <div class="stat-card">
+                <h3>Real News Predictions</h3>
+
+                <p class="number real-number">
+                    {{ real_count }}
+                </p>
+
+                <small>
+                    {{ real_percentage }}% of your predictions
+                </small>
+            </div>
+
+        </section>
+
+        <section class="section">
+
+            <h2>Recent Predictions</h2>
+
+            {% if recent_predictions %}
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Article</th>
+                            <th>Prediction</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in recent_predictions %}
+
+                            <tr>
+
+                                <td>
+                                    {% if item.created_at %}
+                                        {{ item.created_at.strftime(
+                                            '%d %b %Y, %I:%M %p'
+                                        ) }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ item.news_text[:100] }}
+                                    {% if item.news_text|length > 100 %}
+                                        ...
+                                    {% endif %}
+                                </td>
+
+                                <td>
+
+                                    {% if item.prediction == "FAKE NEWS" %}
+
+                                        <span class="badge fake">
+                                            FAKE NEWS
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge real">
+                                            REAL NEWS
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <div class="empty">
+
+                    <p>You haven't made any predictions yet.</p>
+
+                    <p>
+                        Analyze your first news article to see
+                        your statistics here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        Fake News Detection Using Machine Learning
+    </footer>
+
+</body>
+
+</html>

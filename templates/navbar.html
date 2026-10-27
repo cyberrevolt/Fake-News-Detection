@@ -1,0 +1,58 @@
+<nav class="site-navbar">
+    <a class="nav-brand" href="{{ url_for('home') }}">
+        Fake News Detector
+    </a>
+
+    <button
+        class="nav-toggle"
+        type="button"
+        id="navToggle"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+    >
+        ☰
+    </button>
+
+    <div class="nav-links" id="navLinks">
+
+        <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="nav-active" aria-current="page"{% endif %}>Home</a>
+
+        {% if session.get('role') == 'admin'
+              and session.get('admin_logged_in') == True %}
+
+            <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="nav-active" aria-current="page"{% endif %}>Admin Dashboard</a>
+            <a href="{{ url_for('history') }}" {% if request.endpoint == 'history' %}class="nav-active" aria-current="page"{% endif %}>Prediction History</a>
+            <a href="{{ url_for('gemini_test') }}" {% if request.endpoint == 'gemini_test' %}class="nav-active" aria-current="page"{% endif %}>Gemini Test</a>
+            <a href="{{ url_for('logout') }}" class="nav-logout">Logout</a>
+
+        {% elif session.get('role') == 'user'
+                  and session.get('user_logged_in') == True
+                  and session.get('user_id') %}
+
+            <a href="{{ url_for('user_dashboard') }}" {% if request.endpoint == 'user_dashboard' %}class="nav-active" aria-current="page"{% endif %}>My Dashboard</a>
+            <a href="{{ url_for('user_history') }}" {% if request.endpoint == 'user_history' %}class="nav-active" aria-current="page"{% endif %}>My History</a>
+            <a href="{{ url_for('logout') }}" class="nav-logout">Logout</a>
+
+        {% else %}
+
+            <a href="{{ url_for('login') }}" {% if request.endpoint == 'login' %}class="nav-active" aria-current="page"{% endif %}>Login</a>
+            <a href="{{ url_for('register') }}" class="nav-register {% if request.endpoint == 'register' %}nav-active{% endif %}" {% if request.endpoint == 'register' %}aria-current="page"{% endif %}>Register</a>
+
+        {% endif %}
+
+    </div>
+</nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("navToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (toggleButton && navLinks) {
+        toggleButton.addEventListener("click", function () {
+            const isOpen = navLinks.classList.toggle("nav-open");
+            toggleButton.setAttribute("aria-expanded", String(isOpen));
+        });
+    }
+});
+</script>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Fake News Detection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+{% include 'navbar.html' %}
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <p>Fake News Detection Analytics</p>
+    </div>
+
+    <!-- NAVIGATION 
+    <div class="dashboard-navigation">
+
+        <a href="{{ url_for('home') }}" class="nav-button">
+            Analyze News
+        </a>
+
+        <a href="{{ url_for('dashboard') }}" class="nav-button">
+            Admin Dashboard
+        </a>
+
+        <a href="{{ url_for('history') }}" class="nav-button">
+            Prediction History
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-button">
+            Logout
+        </a>
+
+    </div> -->
+
+    <!-- OVERALL STATISTICS -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            
+            <h3>Registered Users</h3>
+            <div class="stat-number">{{ total_users }}</div>
+        </div>
+
+        <div class="stat-card">
+            
+            <h3>Total Predictions</h3>
+            <div class="stat-number">{{ total_predictions }}</div>
+        </div>
+
+        <div class="stat-card fake-stat">
+            <h3>Fake News</h3>
+            <div class="stat-number">{{ fake_count }}</div>
+            <p>{{ fake_percentage }}%</p>
+        </div>
+
+        <div class="stat-card real-stat">
+            <h3>Real News</h3>
+            <div class="stat-number">{{ real_count }}</div>
+            <p>{{ real_percentage }}%</p>
+        </div>
+
+    </div>
+
+    <!-- REGISTERED USERS -->
+    <div class="users-section">
+
+        <h2>Registered Users</h2>
+
+        <p>
+            Total registered accounts:
+            <strong>{{ total_users }}</strong>
+        </p>
+
+        {% if user_stats %}
+
+        <div class="table-wrapper">
+
+            <table class="users-table">
+
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Total Predictions</th>
+                        <th>Fake News</th>
+                        <th>Real News</th>
+                        <th>Registered On</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for user in user_stats %}
+
+                    <tr>
+                        <td>{{ user.id }}</td>
+
+                        <td>
+                            <strong>{{ user.username }}</strong>
+                        </td>
+
+                        <td>{{ user.email }}</td>
+
+                        <td>{{ user.total_predictions }}</td>
+
+                        <td>{{ user.fake_count }}</td>
+
+                        <td>{{ user.real_count }}</td>
+
+                        <td>
+                            {% if user.created_at %}
+                                {{ user.created_at.strftime("%d %b %Y") }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-message">
+            <h3>No registered users yet</h3>
+            <p>Registered accounts will appear here.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- PREDICTION CHART -->
+    <div class="dashboard-card">
+
+        <h2>Fake vs Real News</h2>
+
+        <div class="chart-container">
+
+            <canvas id="predictionChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- RECENT PREDICTIONS -->
+    <div class="dashboard-card">
+
+        <h2>Recent Predictions — All Users</h2>
+
+        {% if recent_predictions %}
+
+        <div class="table-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>News Article</th>
+                        <th>Prediction</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for prediction in recent_predictions %}
+
+                    <tr>
+
+                        <td>{{ prediction.id }}</td>
+
+                        <td>
+                            {% if prediction.user %}
+                                <span class="user-badge registered-user">
+                                    {{ prediction.user.username }}
+                                </span>
+                            {% else %}
+                                <span class="unassigned-user">
+                                    Guest / Unassigned
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="news-text">
+                            {{ prediction.news_text }}
+                        </td>
+
+                        <td>
+                            {% if prediction.prediction == "FAKE NEWS" %}
+                                <span class="fake-badge">
+                                    FAKE NEWS
+                                </span>
+                            {% else %}
+                                <span class="real-badge">
+                                    REAL NEWS
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ "%.4f"|format(prediction.decision_score) }}
+                        </td>
+
+                        <td>
+                            {% if prediction.created_at %}
+                                {{ prediction.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-history">
+            <h3>No predictions yet</h3>
+            <p>Predictions will appear here when news is analyzed.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- CHART JAVASCRIPT -->
+<script>
+    const fakeCount = {{ fake_count | tojson }};
+    const realCount = {{ real_count | tojson }};
+
+    const chartCanvas = document.getElementById("predictionChart");
+
+    new Chart(chartCanvas, {
+        type: "doughnut",
+
+        data: {
+            labels: ["Fake News", "Real News"],
+
+            datasets: [{
+                data: [fakeCount, realCount],
+                borderWidth: 2
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: "#e9e3f7",
+                        padding: 18
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+google-genai
+joblib
+nltk
+numpy
+psycopg2-binary
+python-dotenv
+scikit-learn==1.9.1
